@@ -12,7 +12,7 @@ from .schemas import (
     Contact,
     ListResponse,
     AssociationType,
-    AssociatedHsObject,
+    AssociationName,
 )
 
 # CRUD
@@ -26,7 +26,7 @@ def create_deal(properties: dict[str, str]) -> Deal:
         return deal
 
 
-def read_deal(deal_id: str, properties: list[str] = [], associations: list[AssociatedHsObject] = []) -> Deal:
+def read_deal(deal_id: str, properties: list[str] = [], associations: list[AssociationName] = []) -> Deal:
     default_properties = ["dealname", "dealstage", "amount"]
     if properties:
         default_properties = default_properties + properties

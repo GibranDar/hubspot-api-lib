@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Optional, TypedDict, TypeVar, Literal, Union
+from typing import Optional, TypedDict, TypeVar, Literal, Union, Generic
 
 # GENERICS
 
@@ -9,13 +9,23 @@ HS = TypeVar("HS", bound=str)
 # ASSOCIATIONS
 
 Association = TypedDict("Association", {"id": str, "type": str})
-HsObjectAssociations = TypedDict("HsObjectAssociations", {"results": list[Association]})
-AssociatedHsObject = Literal["companies", "contacts", "deals"]
+HsObjectAssociationResults = TypedDict("HsObjectAssociationResults", {"results": list[Association]})
+AssociationName = Literal["companies", "contacts", "deals"]
 AssociationCategory = Literal["HUBSPOT_DEFINED", "USER_DEFINED", "INTEGRATOR_DEFINED"]
 AssociationType = TypedDict(
     "AssociationType", {"associationCategory": AssociationCategory, "associationTypeId": int}
 )
-HsPropertyResults = TypedDict("HsPropertyResults", {"results": list[dict[str, str]]})
+
+
+class HsPropertyResults(TypedDict, Generic[T]):
+    results: list[T]
+
+
+class HsPropertyGroup(TypedDict):
+    archived: bool
+    display_order: int
+    label: str
+    name: str
 
 
 class HubspotObject(TypedDict):
@@ -23,7 +33,7 @@ class HubspotObject(TypedDict):
     created_at: Union[str, datetime]
     updated_at: Union[str, datetime]
     archived: bool
-    associations: dict[AssociatedHsObject, HsObjectAssociations]
+    associations: dict[AssociationName, HsObjectAssociationResults]
 
 
 # DEALS

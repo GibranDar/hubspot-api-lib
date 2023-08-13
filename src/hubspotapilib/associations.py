@@ -2,13 +2,13 @@ import requests
 import json
 import os
 
-from .schemas import AssociationType, AssociatedHsObject
+from .schemas import AssociationType, AssociationName
 
 
 def create_association(
-    from_obj_type: AssociatedHsObject,
+    from_obj_type: AssociationName,
     from_obj_id: str,
-    to_obj_type: AssociatedHsObject,
+    to_obj_type: AssociationName,
     to_obj_id: str,
     association_ref: AssociationType,
 ):
@@ -24,7 +24,7 @@ def create_association(
 
 
 def delete_association(
-    from_obj_type: AssociatedHsObject, from_obj_id: str, to_obj_type: AssociatedHsObject, to_obj_id: str
+    from_obj_type: AssociationName, from_obj_id: str, to_obj_type: AssociationName, to_obj_id: str
 ):
     url = f"https://api.hubapi.com/crm/v4/objects/{from_obj_type}/{from_obj_id}/associations/{to_obj_type}/{to_obj_id}"
     headers = {"accept": "application/json", "authorization": f"Bearer {os.getenv('HUBSPOT_API_KEY')}"}
@@ -32,7 +32,7 @@ def delete_association(
     return response
 
 
-def update_object(obj_id: str, object_type: AssociatedHsObject, properties: dict[str, str]):
+def update_object(obj_id: str, object_type: AssociationName, properties: dict[str, str]):
     url = f"https://api.hubapi.com/crm/v4/objects/{object_type}/{obj_id}"
     payload = json.dumps({"properties": properties})
     headers = {
