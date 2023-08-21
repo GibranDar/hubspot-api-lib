@@ -36,6 +36,6 @@ def read_all_properties_in_group(
 ) -> list[dict[str, Any]]:
     props = read_all_properties(object_type, archived=archived)
     if results := props.get("results"):
-        group_properties = [prop for prop in results if prop["groupName"] == group_name]
+        group_properties = [prop for prop in results if prop["group_name"] == group_name]
         return group_properties
     raise Exception(f"No properties found for group {group_name} in {object_type}")
