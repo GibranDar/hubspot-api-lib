@@ -52,7 +52,9 @@ def delete_deal(deal_id: str):
         return res
 
 
-def list_deals(limit: int = 100, properties: list[str] = [], after="", archived=False) -> ListResponse[Deal]:
+def list_deals(
+    limit: int = 100, properties: list[str] = [], after: Optional[str] = None, archived: bool = False
+) -> ListResponse[Deal]:
     with hubspot_client() as client:
         res = client.crm.deals.basic_api.get_page(
             limit=limit, properties=properties, archived=archived, after=after
