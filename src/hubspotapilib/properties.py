@@ -6,7 +6,7 @@ from .schemas import AssociationName, HsPropertyResults, HsPropertyGroup
 
 def read_all_properties(
     object_type: AssociationName, property: str = "", archived: bool = False
-) -> HsPropertyResults[dict[str, Any]]:
+) -> HsPropertyResults:
     with hubspot_client() as client:
         request: dict[str, Union[str, bool]] = {"object_type": object_type, "archived": archived}
         if property:
@@ -15,9 +15,7 @@ def read_all_properties(
         return res.to_dict()
 
 
-def read_all_property_groups(
-    object_type: AssociationName, archived: bool = False
-) -> HsPropertyResults[HsPropertyGroup]:
+def read_all_property_groups(object_type: AssociationName, archived: bool = False) -> HsPropertyResults:
     with hubspot_client() as client:
         request: dict[str, Union[str, bool]] = {"object_type": object_type, "archived": archived}
         res = client.crm.properties.groups_api.get_all(**request)

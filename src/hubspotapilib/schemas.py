@@ -17,8 +17,8 @@ AssociationType = TypedDict(
 )
 
 
-class HsPropertyResults(TypedDict, Generic[T]):
-    results: list[T]
+class HsPropertyResults(TypedDict):
+    results: list[dict]
 
 
 class HsPropertyGroup(TypedDict):
