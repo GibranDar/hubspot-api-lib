@@ -179,18 +179,3 @@ class SearchResultsBase(TypedDict, total=False):
 
 class SearchResults(SearchResultsBase):
     paging: ListResponsePaging
-
-
-# HELPER FUNCTIONS
-
-
-def create_search_filter(
-    property_name: str, operator: SearchOperators, value: Union[str, list[str]]
-) -> HsSearchFilters:
-    value_key = "values" if isinstance(value, list) else "value"
-    search_filters: HsSearchFilters = {
-        "propertyName": property_name,
-        "operator": operator,
-        value_key: value,  # type:ignore
-    }
-    return search_filters
