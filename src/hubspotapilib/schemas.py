@@ -148,11 +148,9 @@ def validate_search_value(instance, attribute, value):
 class HsSearchFilters:
     propertyName: str
     operator: SearchOperators
-
-    # can only be one of the following value fields
-    value: str = field(default=None, validator=validate_search_value)
-    highValue: str = field(default=None, validator=validate_search_value)
-    values: list[str] = field(default=None, validator=validate_search_value)
+    value: Optional[str] = field(default=None, validator=validate_search_value)
+    highValue: Optional[str] = field(default=None, validator=validate_search_value)
+    values: Optional[list[str]] = field(default=None, validator=validate_search_value)
 
 
 @define(kw_only=True)
