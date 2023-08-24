@@ -1,6 +1,7 @@
 from typing import Optional
+from attrs import asdict
 
-from hubspot.crm.deals import SimplePublicObjectInput
+from hubspot.crm.deals import SimplePublicObjectInput, PublicObjectSearchRequest
 
 from . import hubspot_client
 from .associations import create_association
@@ -13,6 +14,8 @@ from .schemas import (
     ListResponse,
     AssociationType,
     AssociationName,
+    HsSearchRequest,
+    SearchResults,
 )
 
 # CRUD
@@ -61,6 +64,16 @@ def list_deals(
         )
         deals: ListResponse[Deal] = res.to_dict()
         return deals
+
+
+def search_deals(requests: list[HsSearchRequest]) -> SearchResults:
+    with hubspot_client() as client:
+        response = client.crm.deals.search_api.do_search(
+            public_object_search_request=PublicObjectSearchRequest(
+                filter_groups=[asdict(r) for r in requests]
+            )
+        )
+        return response.to_dict()
 
 
 def associate_deal_with_company(deal_id: str, to_object_id: str):

@@ -1,5 +1,6 @@
 from datetime import datetime
-from typing import Optional, TypedDict, TypeVar, Literal, Union, Generic
+from typing import Optional, TypedDict, TypeVar, Literal, Union, Any
+from attrs import define, field, validators
 
 # GENERICS
 
@@ -106,34 +107,80 @@ SearchOperators = Literal[
     "IN",
     "NOT_IN",
     "HAS_PROPERTY",
-    "CONTAINS_TOKEN",
+    "NOT_HAS_PROPERTY",
+    "CONTAINS_TOKEN",  # token categorised as a whole word, does not partial match
     "NOT_CONTAINS_TOKEN",
 ]
 
 
-class HsSearchFilters(TypedDict):
-    value: str
-    values: list[str]
+def validate_search_value(instance, attribute, value):
+    """Validate that only one of value, highValue, or values is set."""
+
+    if instance.operator in ["IN", "NOT_IN"]:
+        if instance.values is None:
+            raise ValueError("If operator is 'IN' or 'NOT_IN', then 'values' must be set.")
+
+    if instance.operator in ["HAS_PROPERTY", "NOT_HAS_PROPERTY"]:
+        if (instance.values != None) or (instance.value != None) or (instance.highValue != None):
+            raise ValueError(
+                "If operator is 'HAS_PROPERTY' or 'NOT_HAS_PROPERTY', then all value fields must be None."
+            )
+
+    if instance.operator == "BETWEEN":
+        if instance.value is None or instance.highValue is None:
+            raise ValueError("If operator is 'BETWEEN', then 'value' and 'highValue' must both be set.")
+    else:
+        if instance.value is not None and instance.highValue is not None:
+            raise ValueError(
+                f"If 'value' is set, then 'highValue' should be None. Got value: {instance.value}, highValue: {instance.highValue}"
+            )
+        if instance.highValue is not None and instance.values is not None:
+            raise ValueError(
+                f"If 'highValue' is set, then 'values' should be None. Got highValue: {instance.highValue}, values: {instance.values}"
+            )
+        if instance.values is not None and instance.value is not None:
+            raise ValueError(
+                f"If 'values' is set, then 'value' should be None. Got value: {instance.value}, values: {instance.values}"
+            )
+
+
+@define(kw_only=True)
+class HsSearchFilters:
     propertyName: str
     operator: SearchOperators
 
+    # can only be one of the following value fields
+    value: str = field(default=None, validator=validate_search_value)
+    highValue: str = field(default=None, validator=validate_search_value)
+    values: list[str] = field(default=None, validator=validate_search_value)
 
-class HsSearchRequest(TypedDict):
-    filters: HsSearchFilters
+
+@define(kw_only=True)
+class HsSearchRequest:
+    filters: list[HsSearchFilters] = field(factory=list)
     sorts: str
-    query: str
-    properties: list[str]
-    limit: int
-    after: int
+    properties: list[str] = field(
+        validator=validators.deep_iterable(
+            iterable_validator=validators.instance_of(list), member_validator=validators.instance_of(str)
+        )
+    )
+    query: Optional[str] = field(default=None, validator=validators.optional(validators.instance_of(str)))
+    limit: int = field(default=100, validator=validators.instance_of(int))
+    after: Optional[str] = field(default=None, validator=validators.optional(validators.instance_of(str)))
 
 
-ListResponseNextPage = TypedDict("ListResponseNextPage", {"after": str, "link": str})
+ListResponseNextPage = TypedDict("ListResponseNextPage", {"after": str, "link": Optional[str]})
 ListResponsePaging = TypedDict("ListResponsePaging", {"next": ListResponseNextPage})
 ListResponse = TypedDict("ListResponse", {"results": list[OBJ], "paging": ListResponsePaging})
 
 
-class SearchResults(ListResponse[OBJ]):
+class SearchResultsBase(TypedDict, total=False):
     total: int
+    results: list[Any]
+
+
+class SearchResults(SearchResultsBase):
+    paging: ListResponsePaging
 
 
 # HELPER FUNCTIONS
