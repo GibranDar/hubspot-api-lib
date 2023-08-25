@@ -1,7 +1,11 @@
 from typing import Optional
 from attrs import asdict
 
-from hubspot.crm.deals import SimplePublicObjectInput, PublicObjectSearchRequest
+from hubspot.crm.deals import (
+    SimplePublicObjectInput,
+    PublicObjectSearchRequest,
+    BatchReadInputSimplePublicObjectId,
+)
 
 from . import hubspot_client
 from .associations import create_association
@@ -68,12 +72,22 @@ def list_deals(
 
 def search_deals(requests: list[HsSearchRequest]) -> SearchResults:
     with hubspot_client() as client:
-        response = client.crm.deals.search_api.do_search(
+        res = client.crm.deals.search_api.do_search(
             public_object_search_request=PublicObjectSearchRequest(
                 filter_groups=[asdict(r) for r in requests]
             )
         )
-        return response.to_dict()
+        return res.to_dict()
+
+
+def batch_read_deals(deal_ids: list[str], properties: list[str] = []) -> SearchResults:
+    with hubspot_client() as client:
+        res = client.crm.deals.batch_api.read(
+            batch_read_input_simple_public_object_id=BatchReadInputSimplePublicObjectId(
+                inputs=[{"id": id} for id in deal_ids], properties=properties
+            )
+        )
+        return res.to_dict()
 
 
 def associate_deal_with_company(deal_id: str, to_object_id: str):
