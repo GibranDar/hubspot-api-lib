@@ -1,3 +1,4 @@
+from pprint import pprint
 from typing import Optional
 from attrs import asdict
 
@@ -73,6 +74,7 @@ def list_deals(
 def search_deals(request: HsSearchRequest) -> SearchResults:
     with hubspot_client() as client:
         search_obj = asdict(request, recurse=True)
+        pprint(search_obj, indent=2, sort_dicts=False)
         res = client.crm.deals.search_api.do_search(
             public_object_search_request=PublicObjectSearchRequest(**search_obj)
         )

@@ -145,7 +145,7 @@ def validate_search_value(instance, attribute, value):
 
 
 @define(kw_only=True)
-class HsSearchFilters:
+class HsSearchFilterQuery:
     propertyName: str
     operator: SearchOperators
     value: Optional[str] = field(default=None, validator=validate_search_value)
@@ -154,8 +154,15 @@ class HsSearchFilters:
 
 
 @define(kw_only=True)
+class HsSearchFilters:
+    """Read more https://developers.hubspot.com/docs/api/crm/search#filter-search-results"""
+
+    filters: list[HsSearchFilterQuery] = field(factory=list, validator=validators.max_len(3))
+
+
+@define(kw_only=True)
 class HsSearchRequest:
-    filter_groups: list[HsSearchFilters] = field(factory=list)
+    filter_groups: list[HsSearchFilters] = field(factory=list, validator=validators.max_len(3))
     sorts: list[str] = field(
         factory=list, validator=validators.deep_iterable(member_validator=validators.instance_of(str))
     )
