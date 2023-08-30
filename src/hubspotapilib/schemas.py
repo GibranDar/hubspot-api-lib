@@ -155,8 +155,8 @@ class HsSearchFilters:
 
 @define(kw_only=True)
 class HsSearchRequest:
-    filters: list[HsSearchFilters] = field(factory=list)
-    sorts: str
+    filter_groups: list[HsSearchFilters] = field(factory=list)
+    sorts: list[str] = field(factory=list, validator=validators.deep_iterable(member_validator=validators.instance_of(str))) 
     properties: list[str] = field(
         validator=validators.deep_iterable(
             iterable_validator=validators.instance_of(list), member_validator=validators.instance_of(str)

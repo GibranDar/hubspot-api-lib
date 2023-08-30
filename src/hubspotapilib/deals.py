@@ -70,12 +70,11 @@ def list_deals(
         return deals
 
 
-def search_deals(requests: list[HsSearchRequest]) -> SearchResults:
+def search_deals(request: HsSearchRequest) -> SearchResults:
     with hubspot_client() as client:
+        search_obj = asdict(request, recurse=True)
         res = client.crm.deals.search_api.do_search(
-            public_object_search_request=PublicObjectSearchRequest(
-                filter_groups=[asdict(r) for r in requests]
-            )
+            public_object_search_request=PublicObjectSearchRequest(**search_obj)
         )
         return res.to_dict()
 
