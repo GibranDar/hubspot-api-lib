@@ -156,7 +156,9 @@ class HsSearchFilters:
 @define(kw_only=True)
 class HsSearchRequest:
     filter_groups: list[HsSearchFilters] = field(factory=list)
-    sorts: list[str] = field(factory=list, validator=validators.deep_iterable(member_validator=validators.instance_of(str))) 
+    sorts: list[str] = field(
+        factory=list, validator=validators.deep_iterable(member_validator=validators.instance_of(str))
+    )
     properties: list[str] = field(
         validator=validators.deep_iterable(
             iterable_validator=validators.instance_of(list), member_validator=validators.instance_of(str)
@@ -164,7 +166,7 @@ class HsSearchRequest:
     )
     query: Optional[str] = field(default=None, validator=validators.optional(validators.instance_of(str)))
     limit: int = field(default=100, validator=validators.instance_of(int))
-    after: Optional[str] = field(default=None, validator=validators.optional(validators.instance_of(str)))
+    after: int = field(default=0, validator=validators.instance_of(int))
 
 
 ListResponseNextPage = TypedDict("ListResponseNextPage", {"after": str, "link": Optional[str]})
