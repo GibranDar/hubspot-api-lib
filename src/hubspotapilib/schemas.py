@@ -161,6 +161,13 @@ class HsSearchFilters:
 
 
 @define(kw_only=True)
+class HsSearchTextQuery:
+    query: str = field(validator=validators.instance_of(str))
+    limit: int = field(default=100, validator=validators.instance_of(int))
+    after: int = field(default=0, validator=validators.instance_of(int))
+
+
+@define(kw_only=True)
 class HsSearchRequest:
     filter_groups: list[HsSearchFilters] = field(factory=list, validator=validators.max_len(3))
     sorts: list[str] = field(
