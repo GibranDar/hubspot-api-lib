@@ -102,23 +102,31 @@ def associate_deal_with_contact(deal_id: str, to_object_id: str):
     return res
 
 
-def get_deal_to_company(deal: Deal) -> Optional[Company]:
+def get_deal_to_company(deal: Deal) -> Optional[list[Company]]:
     if deal.get("associations") is None or not deal["associations"].get("companies"):
         return None
+
     if assocs := deal["associations"].get("companies"):
+        companies: list[Company] = []
         for item in assocs["results"]:
             if item["type"] == "deal_to_company":
                 company = read_company(item["id"], properties=["name"])
-                return company
+                companies.append(company)
+        return companies
+
     return None
 
 
-def get_deal_to_contact(deal: Deal) -> Optional[Contact]:
+def get_deal_to_contact(deal: Deal) -> Optional[list[Contact]]:
     if deal.get("associations") is None or not deal["associations"].get("contacts"):
         return None
+
     if assocs := deal["associations"].get("contacts"):
+        contacts: list[Contact] = []
         for item in assocs["results"]:
             if item["type"] == "deal_to_contact":
                 contact = read_contact(item["id"])
-                return contact
+                contacts.append(contact)
+        return contacts
+
     return None
